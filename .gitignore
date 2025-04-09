@@ -1,0 +1,84 @@
+# Go-zero specific
+*.api.go
+*.api.json
+*.rpc.go
+*.rpc.pb.go
+
+# Golang specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Binary files
+/bin/
+/release/
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Dependency directories
+/vendor/
+/go.sum
+
+# Log files
+*.log
+/logs/
+/log/
+
+# Environment files
+.env
+.env.local
+*.local.yml
+*.local.yaml
+
+# Build output
+/_output/
+/_build/
+/dist/
+/build/
+
+# Test coverage
+/coverage/
+coverage.txt
+coverage.html
+
+# Temporary files
+/tmp/
+/temp/
+
+# Config files (if needed)
+*.yaml
+*.yml
+*.toml
+*.json
+
+# Generated files
+*_gen.go
+*.pb.go
+*.pb.gw.go
+*_easyjson.go
+
+# Cache directories
+.cache/
+
+# Air live reload
+tmp/
+
+# Etcd
+default.etcd/
+
+# Goland debug
+__debug_bin
+
+# System Files
+.DS_Store
+Thumbs.db

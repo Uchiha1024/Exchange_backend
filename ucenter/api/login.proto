@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package login;
+
+// protoc-gen-go 版本大于1.4.0, proto文件需要加上go_package,否则无法生成
+option go_package = "./login";
+
+message LoginReq {
+  string username = 1;
+  string password = 2;
+  CaptchaReq captcha = 3;
+  string ip = 4;
+}
+
+message CaptchaReq {
+  string server = 1;
+  string token = 2;
+}
+message LoginRes {
+  string username = 1;
+  string token = 2;
+  string memberLevel = 3;
+  string realName = 4;
+  string country = 5;
+  string avatar = 6;
+  string promotionCode = 7;
+  int64 id = 8;
+  int32 loginCount = 9;
+  string superPartner = 10;
+  int32 memberRate = 11;
+}
+
+service Login {
+  rpc login(LoginReq) returns(LoginRes);
+}

@@ -29,6 +29,10 @@ func (t *Task) Run() {
 		logic.NewKline(t.ctx.Config.Okx, t.ctx.MongoClient).Do("1m")
 	})
 
+	t.s.Every(1).Hour().Do(func() {
+		logic.NewKline(t.ctx.Config.Okx, t.ctx.MongoClient).Do("1H")
+	})
+
 	t.s.Every(1).Minute().Do(func() {
 		logic.NewRate(t.ctx.Config.Okx, t.ctx.Cache).Do()
 	})

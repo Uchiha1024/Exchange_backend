@@ -1,6 +1,9 @@
 package domain
 
-import "strings"
+import (
+
+	"strings"
+)
 
 type ExchangeRateDomain struct {
 }
@@ -20,3 +23,4 @@ func (d *ExchangeRateDomain) UsdRate(unit string) float64 {
 	return 0
 
 }
+

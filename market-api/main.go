@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
+
 	// "github.com/zeromicro/go-zero/rest/chain"
 	"market-api/internal/config"
 	"market-api/internal/handler"
@@ -36,7 +38,7 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	router := handler.NewRouters(server, c.Prefix)
-	handler.RegisterHandlers(router, ctx)
+	handler.MarketHandlers(router, ctx)
 
 	group := service.NewServiceGroup()
 	group.Add(server)

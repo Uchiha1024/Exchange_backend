@@ -11,4 +11,5 @@ type Config struct {
 	Okx        logic.OkxConfig
 	Mongo      database.MongoConfig
 	CacheRedis cache.CacheConf
+	Kafka	    database.KafkaConfig
 }

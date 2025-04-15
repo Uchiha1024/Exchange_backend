@@ -10,6 +10,7 @@ type ServiceContext struct {
 	Config      config.Config
 	MongoClient *database.MongoClient
 	Cache       cache.Cache
+	KafkaClient *database.KafkaClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -20,10 +21,14 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		cache.NewStat("mscoin"),
 		nil,
 		func(o *cache.Options) {})
+	// 初始化 kafka
+	client := database.NewKafkaClient(c.Kafka)
+	client.StartWrite()
 
 	return &ServiceContext{
 		Config:      c,
 		MongoClient: database.ConnectMongo(c.Mongo),
 		Cache:       redisCache,
+		KafkaClient:  client,
 	}
 }

@@ -26,11 +26,11 @@ func (t *Task) Run() {
 
 
 	t.s.Every(1).Minute().Do(func() {
-		logic.NewKline(t.ctx.Config.Okx, t.ctx.MongoClient).Do("1m")
+		logic.NewKline(t.ctx.Config.Okx, t.ctx.MongoClient, t.ctx.KafkaClient, t.ctx.Cache).Do("1m")
 	})
 
 	t.s.Every(1).Hour().Do(func() {
-		logic.NewKline(t.ctx.Config.Okx, t.ctx.MongoClient).Do("1H")
+		logic.NewKline(t.ctx.Config.Okx, t.ctx.MongoClient, t.ctx.KafkaClient, t.ctx.Cache).Do("1H")
 	})
 
 	t.s.Every(1).Minute().Do(func() {

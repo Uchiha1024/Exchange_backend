@@ -5,10 +5,12 @@ import (
 	"jobcenter/internal/database"
 	"jobcenter/internal/domain"
 	"mscoin-common/tools"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/cache"
 )
 
 type OkxConfig struct {
@@ -29,12 +31,17 @@ type Kline struct {
 	wg          sync.WaitGroup
 	okx         OkxConfig
 	klineDomain *domain.KlineDomain
+	queueDomain *domain.QueueDomain
+	redisCache  cache.Cache
 }
 
-func NewKline(okx OkxConfig, mongoClient *database.MongoClient) *Kline {
+func NewKline(okx OkxConfig, mongoClient *database.MongoClient,kafkaCli *database.KafkaClient, cache2 cache.Cache) *Kline {
 	return &Kline{
 		okx:         okx,
 		klineDomain: domain.NewKlineDomain(mongoClient),
+		queueDomain: domain.NewQueueDomain(kafkaCli),
+		redisCache: cache2,
+
 	}
 }
 
@@ -80,6 +87,23 @@ func (k *Kline) getKlineData(instId string, symbol string, period string) {
 			k.wg.Done()
 			return
 		}
+		
+		if period == "1m" {
+			//把这个最新的数据result.Data[0] 推送到market服务，推送到前端页面，实时进行变化
+		//->kafka->market kafka消费者进行数据消费-> 通过websocket通道发送给前端 ->前端更新数据
+			if len(result.Data)>0 {
+				kafkaData := result.Data[0]
+				k.queueDomain.Send1mKline(kafkaData,symbol)
+				// 存入 redis 保存最新价格
+				redisKey := strings.ReplaceAll(instId,"-", "::")
+				k.redisCache.Set(redisKey+"::RATE", kafkaData[4])
+
+
+			}
+
+		}
+
+
 	
 	}
 	k.wg.Done()

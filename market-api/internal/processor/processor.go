@@ -56,9 +56,10 @@ func (d *DefaultProcessor) AddHandler(h MarketHandler) {
 }
 
 func (p *DefaultProcessor) Init(marketRpc mclient.Market) {
+	p.initThumbMap(marketRpc)
 	p.startReadFromKafka(KLINE1M, KLINE)
 	p.startReadTradePlate(TradePlateTopic)
-	p.initThumbMap(marketRpc)
+
 }
 
 type ProcessData struct {
@@ -116,17 +117,6 @@ func (d *DefaultProcessor) Process(data ProcessData) {
 }
 
 
-func (d *DefaultProcessor) GetThumb() any {
-	cs := make([]*market.CoinThumb, len(d.thumbMap))
-	i := 0
-	for _, v := range d.thumbMap {
-		cs[i] = v
-		i++
-	}
-	return cs
-}
-
-
 func (d *DefaultProcessor) initThumbMap(marketRpc mclient.Market) {
 	symbolThumbRes, err := marketRpc.FindSymbolThumbTrend(context.Background(),
 		&market.MarketReq{})
@@ -139,5 +129,18 @@ func (d *DefaultProcessor) initThumbMap(marketRpc mclient.Market) {
 		}
 	}
 }
+
+func (d *DefaultProcessor) GetThumb() any {
+	cs := make([]*market.CoinThumb, len(d.thumbMap))
+	i := 0
+	for _, v := range d.thumbMap {
+		cs[i] = v
+		i++
+	}
+	return cs
+}
+
+
+
 
 

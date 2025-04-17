@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"github.com/zeromicro/go-zero/core/conf"
 	"jobcenter/internal/config"
 	"jobcenter/internal/svc"
 	"jobcenter/internal/task"
@@ -10,6 +9,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/zeromicro/go-zero/core/conf"
 )
 
 var configFile = flag.String("f", "etc/conf.yaml", "the config file")
@@ -24,16 +25,12 @@ func main() {
 	t.Run()
 	//优雅退出
 	go func() {
-		exit := make(chan os.Signal)
+		exit := make(chan os.Signal, 1)
 		signal.Notify(exit, syscall.SIGINT, syscall.SIGTERM)
-		select {
-		case <-exit:
-			log.Println("任务中心中断执行，开始clear资源")
-			t.Stop()
-			ctx.MongoClient.Disconnect()
-		
-			
-		}
+		<-exit
+		log.Println("任务中心中断执行，开始clear资源")
+		t.Stop()
+		ctx.MongoClient.Disconnect()
 	}()
 	t.StartBlocking()
 }

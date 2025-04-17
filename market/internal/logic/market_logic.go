@@ -6,6 +6,7 @@ import (
 	"market/internal/domain"
 	"market/internal/svc"
 
+	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -50,5 +51,20 @@ func (l *MarketLogic) SymbolThumbTrend(req *market.MarketReq) (*market.SymbolThu
 	return &market.SymbolThumbRes{
 		List: coinThumbs,
 	}, nil
+
+}
+
+func (l *MarketLogic) SymbolInfo(in *market.MarketReq) (*market.ExchangeCoin, error) {
+
+	coin, err := l.exchangeCoinDomain.FindBySymbol(l.ctx, in.Symbol)
+	if err != nil {
+		return nil, err
+	}
+	exchangeCoin := &market.ExchangeCoin{}
+	if err := copier.Copy(exchangeCoin, coin); err != nil {
+		logx.Errorf("copy exchange coin to response error: %v", err)
+		return nil, err
+	}
+	return exchangeCoin, nil
 
 }

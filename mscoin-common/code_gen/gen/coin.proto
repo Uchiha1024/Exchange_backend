@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+message Coin{
+    int32 id  = 1;
+    string name  = 2;
+    int32 canAutoWithdraw  = 3;
+    int32 canRecharge  = 4;
+    int32 canTransfer  = 5;
+    int32 canWithdraw  = 6;
+    double cnyRate  = 7;
+    int32 enableRpc  = 8;
+    int32 isPlatformCoin  = 9;
+    double maxTxFee  = 10;
+    double maxWithdrawAmount  = 11;
+    double minTxFee  = 12;
+    double minWithdrawAmount  = 13;
+    string nameCn  = 14;
+    int32 sort  = 15;
+    int32 status  = 16;
+    string unit  = 17;
+    double usdRate  = 18;
+    double withdrawThreshold  = 19;
+    int32 hasLegal  = 20;
+    string coldWalletAddress  = 21;
+    double minerFee  = 22;
+    int32 withdrawScale  = 23;
+    int32 accountType  = 24;
+    string depositAddress  = 25;
+    string infolink  = 26;
+    string information  = 27;
+    double minRechargeAmount  = 28;
+}

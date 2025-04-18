@@ -17,6 +17,8 @@ type MarketLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
+
+
 func NewMarketLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MarketLogic {
 	return &MarketLogic{
 		Logger: logx.WithContext(ctx),
@@ -126,4 +128,32 @@ func (l *MarketLogic) SymbolInfo(req *types.MarketReq) (*types.ExchangeCoinResp,
 
 	return &resp, nil
 
+}
+
+
+
+func (l *MarketLogic) CoinInfo(req *types.MarketReq) (*types.Coin, error) {
+
+		// 创建一个带超时的上下文，5秒后自动取消
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		// 确保在函数返回时取消上下文
+		defer cancel()
+
+		coinInfoResp, err := l.svcCtx.MarketRpc.FindCoinInfo(ctx,&market.MarketReq{
+			Unit: req.Unit,
+		})
+
+		if err != nil {
+			logx.Errorw("RPC-CoinInfo",logx.Field("err",err))
+			return nil, err
+		}
+
+		coinInfo := types.Coin{}
+
+		if err := copier.Copy(&coinInfo, coinInfoResp); err != nil {
+			return nil, err
+		}
+
+		return &coinInfo, nil
+	
 }

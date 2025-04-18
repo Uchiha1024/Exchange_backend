@@ -29,3 +29,8 @@ func (s *MarketServer) FindSymbolInfo(ctx context.Context, in *market.MarketReq)
 	logic := logic.NewMarketLogic(ctx, s.svcCtx)
 	return logic.SymbolInfo(in)
 }
+
+func (s *MarketServer) FindCoinInfo(ctx context.Context, in *market.MarketReq) (*market.Coin, error) {
+	logic := logic.NewMarketLogic(ctx, s.svcCtx)
+	return logic.CoinInfo(in)
+}

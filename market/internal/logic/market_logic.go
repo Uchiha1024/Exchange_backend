@@ -16,6 +16,7 @@ type MarketLogic struct {
 	svcCtx             *svc.ServiceContext
 	exchangeCoinDomain *domain.ExchangeCoinDomain
 	marketDomain       *domain.MarketDomain
+	coinDomain         *domain.CoinDomain
 }
 
 func NewMarketLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MarketLogic {
@@ -25,6 +26,7 @@ func NewMarketLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MarketLogi
 		svcCtx:             svcCtx,
 		exchangeCoinDomain: domain.NewExchangeCoinDomain(svcCtx.Db),
 		marketDomain:       domain.NewMarketDomain(svcCtx.MongoClient),
+		coinDomain:         domain.NewCoinDomain(svcCtx.Db),
 	}
 }
 
@@ -66,5 +68,21 @@ func (l *MarketLogic) SymbolInfo(in *market.MarketReq) (*market.ExchangeCoin, er
 		return nil, err
 	}
 	return exchangeCoin, nil
+
+}
+
+
+
+func (l *MarketLogic) CoinInfo(in *market.MarketReq) (*market.Coin, error) {
+	coin, err := l.coinDomain.FindByUnit(l.ctx, in.Unit)
+	if err != nil {
+		return nil, err
+	}
+	coinInfo := &market.Coin{}
+	if err := copier.Copy(coinInfo, coin); err != nil {
+		logx.Errorf("copy coinInfo to response error: %v", err)
+		return nil, err
+	}
+	return coinInfo, nil
 
 }

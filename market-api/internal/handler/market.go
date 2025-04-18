@@ -8,6 +8,7 @@ import (
 	"mscoin-common/tools"
 	"net/http"
 
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
@@ -33,7 +34,6 @@ func (h *MarketHandler) SymbolThumbTrend(w http.ResponseWriter, r *http.Request)
 
 }
 
-
 func (h *MarketHandler) SymbolThumb(w http.ResponseWriter, r *http.Request) {
 	var req types.MarketReq
 	newResult := common.NewResult()
@@ -45,12 +45,10 @@ func (h *MarketHandler) SymbolThumb(w http.ResponseWriter, r *http.Request) {
 	httpx.OkJsonCtx(r.Context(), w, result)
 }
 
-
-
 func (h *MarketHandler) SymbolInfo(w http.ResponseWriter, r *http.Request) {
 	var req types.MarketReq
 	if err := httpx.ParseForm(r, &req); err != nil {
-		httpx.ErrorCtx(r.Context(),w,err)
+		httpx.ErrorCtx(r.Context(), w, err)
 		return
 	}
 
@@ -62,7 +60,23 @@ func (h *MarketHandler) SymbolInfo(w http.ResponseWriter, r *http.Request) {
 	result := newResult.Deal(resp, err)
 	httpx.OkJsonCtx(r.Context(), w, result)
 
+}
 
+func (h *MarketHandler) CoinInfo(w http.ResponseWriter, r *http.Request) {
 
+	var req types.MarketReq
+	if err := httpx.ParseForm(r, &req); err != nil {
+		httpx.ErrorCtx(r.Context(), w, err)
+		return
+	}
+
+	newResult := common.NewResult()
+
+	req.Ip = tools.GetRemoteClientIp(r)
+	l := logic.NewMarketLogic(r.Context(), h.svcCtx)
+	logx.Infof("CoinInfo req: %v", req)
+	resp, err := l.CoinInfo(&req)
+	result := newResult.Deal(resp, err)
+	httpx.OkJsonCtx(r.Context(), w, result)
 
 }

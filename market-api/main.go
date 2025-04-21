@@ -43,7 +43,7 @@ func main() {
 
 	group := service.NewServiceGroup()
 	group.Add(server)
-	// group.Add(wsServer)
+	group.Add(wsServer)
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	group.Start()
 }

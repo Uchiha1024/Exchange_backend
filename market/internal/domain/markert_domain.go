@@ -73,3 +73,24 @@ func (d *MarketDomain) SymbolThumbTrend(coins []*model.ExchangeCoin) []*market.C
 	return coinThumbs
 
 }
+
+func (d *MarketDomain) HistoryKline(ctx context.Context, symbol string, period string, from int64, to int64) ([]*market.History, error) {
+
+	klines, err := d.KlineRepo.FindBySymbolTime(ctx, symbol, period, from, to, "asc")
+	if err != nil {
+		return nil, err
+	}
+
+	histories := make([]*market.History, len(klines))
+	for i, v := range klines {
+		h := &market.History{}
+		h.Time = v.Time
+		h.Open = v.OpenPrice
+		h.High = v.HighestPrice
+		h.Low = v.LowestPrice
+		h.Volume = v.Volume
+		h.Close = v.ClosePrice
+		histories[i] = h
+	}
+	return histories, nil
+}

@@ -17,8 +17,6 @@ type MarketLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-
-
 func NewMarketLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MarketLogic {
 	return &MarketLogic{
 		Logger: logx.WithContext(ctx),
@@ -130,30 +128,62 @@ func (l *MarketLogic) SymbolInfo(req *types.MarketReq) (*types.ExchangeCoinResp,
 
 }
 
-
-
 func (l *MarketLogic) CoinInfo(req *types.MarketReq) (*types.Coin, error) {
 
-		// 创建一个带超时的上下文，5秒后自动取消
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		// 确保在函数返回时取消上下文
-		defer cancel()
+	// 创建一个带超时的上下文，5秒后自动取消
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// 确保在函数返回时取消上下文
+	defer cancel()
 
-		coinInfoResp, err := l.svcCtx.MarketRpc.FindCoinInfo(ctx,&market.MarketReq{
-			Unit: req.Unit,
-		})
+	coinInfoResp, err := l.svcCtx.MarketRpc.FindCoinInfo(ctx, &market.MarketReq{
+		Unit: req.Unit,
+	})
 
-		if err != nil {
-			logx.Errorw("RPC-CoinInfo",logx.Field("err",err))
-			return nil, err
-		}
+	if err != nil {
+		logx.Errorw("RPC-CoinInfo", logx.Field("err", err))
+		return nil, err
+	}
 
-		coinInfo := types.Coin{}
+	coinInfo := types.Coin{}
 
-		if err := copier.Copy(&coinInfo, coinInfoResp); err != nil {
-			return nil, err
-		}
+	if err := copier.Copy(&coinInfo, coinInfoResp); err != nil {
+		return nil, err
+	}
 
-		return &coinInfo, nil
-	
+	return &coinInfo, nil
+
+}
+
+func (l *MarketLogic) History(req *types.MarketReq) (*types.HistoryKline, error) {
+	// 创建一个带超时的上下文，5秒后自动取消
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// 确保在函数返回时取消上下文
+	defer cancel()
+	historyKline, err := l.svcCtx.MarketRpc.HistoryKline(ctx, &market.MarketReq{
+		Symbol:     req.Symbol,
+		From:       req.From,
+		To:         req.To,
+		Resolution: req.Resolution,
+	})
+	if err != nil {
+		logx.Errorw("RPC-HistoryKline", logx.Field("err", err))
+		return nil, err
+	}
+
+	histories := historyKline.List
+	var list = make([][]any, len(histories))
+	for i, v := range histories {
+		content := make([]any, 6)
+		content[0] = v.Time
+		content[1] = v.Open
+		content[2] = v.High
+		content[3] = v.Low
+		content[4] = v.Close
+		content[5] = v.Volume
+		list[i] = content
+
+	}
+	return &types.HistoryKline{
+		List: list,
+	}, nil
 }

@@ -80,3 +80,21 @@ func (h *MarketHandler) CoinInfo(w http.ResponseWriter, r *http.Request) {
 	httpx.OkJsonCtx(r.Context(), w, result)
 
 }
+
+
+func (h *MarketHandler) History(w http.ResponseWriter, r *http.Request) {
+	var req types.MarketReq
+	if err := httpx.ParseForm(r, &req); err != nil {
+		httpx.ErrorCtx(r.Context(), w, err)
+		return
+	}
+
+	newResult := common.NewResult()
+
+	req.Ip = tools.GetRemoteClientIp(r)
+	l := logic.NewMarketLogic(r.Context(), h.svcCtx)
+	logx.Infof("CoinInfo req: %v", req)
+	resp, err := l.History(&req)
+	result := newResult.Deal(resp, err)
+	httpx.OkJsonCtx(r.Context(), w, result)
+}

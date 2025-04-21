@@ -86,3 +86,35 @@ func (l *MarketLogic) CoinInfo(in *market.MarketReq) (*market.Coin, error) {
 	return coinInfo, nil
 
 }
+
+
+func (l *MarketLogic) HistoryKline(req *market.MarketReq) (*market.HistoryRes, error) {
+	period := "1H"
+	if req.Resolution == "60" {
+		period = "1H"
+	} else if req.Resolution == "30" {
+		period = "30m"
+	} else if req.Resolution == "15" {
+		period = "15m"
+	} else if req.Resolution == "5" {
+		period = "5m"
+	} else if req.Resolution == "1" {
+		period = "1m"
+	} else if req.Resolution == "1D" {
+		period = "1D"
+	} else if req.Resolution == "1W" {
+		period = "1W"
+	} else if req.Resolution == "1M" {
+		period = "1M"
+	}
+
+	histories,err := l.marketDomain.HistoryKline(l.ctx,req.Symbol,period,req.From,req.To)
+	if err != nil {
+		return nil,err
+	}
+
+	return &market.HistoryRes{
+		List: histories,
+	}, nil
+
+}

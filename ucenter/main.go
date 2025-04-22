@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"grpc-common/ucenter/types/asset"
 	"grpc-common/ucenter/types/login"
 	"grpc-common/ucenter/types/register"
 	"ucenter/internal/config"
@@ -30,6 +31,7 @@ func main() {
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		register.RegisterRegisterServer(grpcServer, server.NewRegisterServer(ctx))
 		login.RegisterLoginServer(grpcServer, server.NewLoginServer(ctx))
+		asset.RegisterAssetServer(grpcServer, server.NewAssetServer(ctx))
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
 		}

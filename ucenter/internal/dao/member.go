@@ -4,7 +4,7 @@ import (
 	"context"
 	"mscoin-common/msdb"
 	"mscoin-common/msdb/gorms"
-	"ucenter/model"
+	"ucenter/internal/model"
 
 	"gorm.io/gorm"
 )

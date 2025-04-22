@@ -4,19 +4,26 @@
 package handler
 
 import (
-
+	midd "ucenter-api/internal/mid"
 	"ucenter-api/internal/svc"
-	
 )
 
 func RegisterHandlers(r *Routes, serverCtx *svc.ServiceContext) {
 	// 中间件
+	// 注册
 	register := NewRegisterHandler(serverCtx)
 	registerRouter := r.Group()
 	registerRouter.Post("/uc/register/phone", register.Register)
 	registerRouter.Post("/uc/mobile/code", register.SendCode)
+	// 登录
 	loginGroup := r.Group()
 	login := NewLoginHandler(serverCtx)
 	loginGroup.Post("/uc/login",login.Login)
 	loginGroup.Post("/uc/check/login",login.CheckLogin)
+
+	assetGroup := r.Group()
+	assetGroup.Use(midd.Auth(serverCtx.Config.JWT.AccessSecret))
+	asset := NewAssetHandler(serverCtx)
+	assetGroup.Post("/uc/asset/wallet/:coinName", asset.FindWalletBySymbol)
+
 }

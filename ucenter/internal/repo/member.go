@@ -2,7 +2,7 @@ package repo
 
 import (
 	"context"
-	"ucenter/model"
+	"ucenter/internal/model"
 )
 
 type MemberRepo interface {

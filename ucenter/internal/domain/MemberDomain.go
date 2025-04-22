@@ -7,8 +7,8 @@ import (
 	"mscoin-common/tools"
 	"regexp"
 	"ucenter/internal/dao"
-	"ucenter/model"
-	"ucenter/repo"
+	"ucenter/internal/model"
+	"ucenter/internal/repo"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

@@ -59,3 +59,7 @@ func (r *Routes) Group() *Routes{
 		server: r.server,
 	}
 }
+
+func (r *Routes) Use(middle ...rest.Middleware) {
+	r.middleware = append(r.middleware, middle...)
+}

@@ -41,7 +41,7 @@ func (l *LoginLogic) CheckLogin(token string) (bool, error) {
 
 
 
-func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginRes, err error) {
+func (l *LoginLogic) Login(req *types.LoginReq) ( *types.LoginRes, error) {
 	// todo: add your logic here and delete this line
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -51,10 +51,15 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginRes, err error
 		return nil, err
 	}
 
-	_, err = l.svcCtx.UCLoginRpc.Login(ctx, loginReq)
+	loginResp, err := l.svcCtx.UCLoginRpc.Login(ctx, loginReq)
 	if err != nil {
 		return nil, err
 	}
 
-	return
+	resp := &types.LoginRes{}
+	if err := copier.Copy(resp, loginResp); err != nil {
+		return nil, err
+	}
+
+	return resp, err
 }

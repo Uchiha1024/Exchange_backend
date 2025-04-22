@@ -8,6 +8,7 @@ import (
 type Config struct {
 	rest.RestConf
 	UcenterRpc zrpc.RpcClientConf
+	MarketRpc  zrpc.RpcClientConf
 	JWT        AuthConfig
 }
 

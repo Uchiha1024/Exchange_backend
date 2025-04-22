@@ -48,7 +48,7 @@ func (l *LoginLogic) Login(in *login.LoginReq) (*login.LoginRes, error) {
 	*/
 	logx.Info("人机验证通过")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
 	// 验证用户名密码
@@ -84,6 +84,7 @@ func (l *LoginLogic) Login(in *login.LoginReq) (*login.LoginRes, error) {
 	}(member.Id)
 
 
+	
 	return &login.LoginRes{
 		Token:         token,
 		Id:            member.Id,

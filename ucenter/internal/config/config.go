@@ -11,6 +11,7 @@ type Config struct {
 	CacheRedis cache.CacheConf
 	Captcha CaptchaConfig
 	JWT         AuthConfig
+	MarketRpc zrpc.RpcClientConf
 }
 
 type AuthConfig struct {

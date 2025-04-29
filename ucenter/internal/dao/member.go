@@ -42,3 +42,13 @@ func (m *MemberDao) FindByPhone(context context.Context, phone string) (*model.M
 	}
 	return &mem, nil
 }
+
+
+func (m *MemberDao) FindMemberById(ctx context.Context, memberId int64) (Member *model.Member,err error) {
+	session := m.conn.Session(ctx)
+	err = session.Model(&model.Member{}).Where("id = ?", memberId).Take(&Member).Error
+	if err != nil && err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return
+}

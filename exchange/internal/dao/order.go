@@ -7,6 +7,7 @@ import (
 	"mscoin-common/msdb/gorms"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"gorm.io/gorm"
 )
 
 type ExchangeOrderDao struct {
@@ -57,3 +58,47 @@ func (e *ExchangeOrderDao) FindOrderCurrent(ctx context.Context, symbol string, 
 	}
 	return
 }
+
+func (e *ExchangeOrderDao) FindCurrentTradingCount(ctx context.Context, id int64, symbol string, direction int) (total int64, err error) {
+	session := e.conn.Session(ctx)
+	err = session.Model(&model.ExchangeOrder{}).
+		Where("symbol=? and member_id=? and direction=? and status=?", symbol, id, direction, model.Trading).
+		Count(&total).Error
+	return
+}
+
+func (e *ExchangeOrderDao) Save(ctx context.Context, conn msdb.DbConn, order *model.ExchangeOrder) error {
+	e.conn = conn.(*gorms.GormConn)
+	tx := e.conn.Tx(ctx)
+	err := tx.Save(&order).Error
+	return err
+}
+
+func (e *ExchangeOrderDao) FindOrderByOrderId(ctx context.Context, orderId string) (order *model.ExchangeOrder, err error) {
+	session := e.conn.Session(ctx)
+
+	err = session.Model(&model.ExchangeOrder{}).
+		Where("order_id=?", orderId).
+		First(&order).Error
+	if err != nil && err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return
+}
+
+func (e *ExchangeOrderDao) UpdateStatusCancel(ctx context.Context, orderId string) error {
+	session := e.conn.Session(ctx)
+	err := session.Model(&model.ExchangeOrder{}).
+		Where("order_id=?", orderId).
+		Update("status", model.Canceled).Error
+	return err
+}
+
+func (e *ExchangeOrderDao) UpdateOrderStatusTrading(ctx context.Context, orderId string) error {
+	session := e.conn.Session(ctx)
+	err := session.Model(&model.ExchangeOrder{}).
+		Where("order_id=?", orderId).
+		Update("status", model.Trading).Error
+	return err
+}
+

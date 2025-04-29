@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"grpc-common/ucenter/types/asset"
 	"grpc-common/ucenter/types/login"
+	"grpc-common/ucenter/types/member"
 	"grpc-common/ucenter/types/register"
 	"ucenter/internal/config"
 	"ucenter/internal/server"
@@ -32,6 +33,7 @@ func main() {
 		register.RegisterRegisterServer(grpcServer, server.NewRegisterServer(ctx))
 		login.RegisterLoginServer(grpcServer, server.NewLoginServer(ctx))
 		asset.RegisterAssetServer(grpcServer, server.NewAssetServer(ctx))
+		member.RegisterMemberServer(grpcServer, server.NewMemberServer(ctx))
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
 		}

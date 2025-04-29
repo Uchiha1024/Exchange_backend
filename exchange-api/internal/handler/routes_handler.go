@@ -15,5 +15,5 @@ func OrderHandlers(r *Routers, serverCtx *svc.ServiceContext) {
 	orderGroup.Post("/order/history",order.History)
 	//当前委托订单 状态 正在交易的状态
 	orderGroup.Post("/order/current",order.Current)
-	// orderGroup.Post("/order/add",order.Add)
+	orderGroup.Post("/order/add",order.Add)
 }

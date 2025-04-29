@@ -31,7 +31,6 @@ type KafkaClient struct {
 	mutex     sync.Mutex
 }
 
-
 func NewKafkaClient(c KafkaConfig) *KafkaClient {
 	return &KafkaClient{
 		c: c,
@@ -56,26 +55,6 @@ func (w *KafkaClient) Send(data KafkaData) {
 	}()
 	w.writeChan <- data
 	w.closed = false
-}
-
-func (k *KafkaClient) SendSync(data KafkaData) error {
-	w := &kafka.Writer{
-		Addr:     kafka.TCP(k.c.Addr),
-		Balancer: &kafka.LeastBytes{},
-	}
-	k.w = w
-	messages := []kafka.Message{
-		{
-			Topic: data.Topic,
-			Key:   data.Key,
-			Value: data.Data,
-		},
-	}
-	var err error
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	err = k.w.WriteMessages(ctx, messages...)
-	return err
 }
 
 func (w *KafkaClient) Close() {
@@ -135,7 +114,20 @@ func (w *KafkaClient) sendKafka() {
 
 }
 
-func (k *KafkaClient) StartRead(topic string) *KafkaClient {
+func (k *KafkaClient) StartRead(topic string) {
+	r := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{k.c.Addr},
+		Topic:    topic,
+		GroupID:  k.c.ConsumerGroup,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+	})
+	k.r = r
+	k.readChan = make(chan KafkaData, k.c.ReadCap)
+	go k.readMsg()
+}
+
+func (k *KafkaClient) StartReadNew(topic string) *KafkaClient {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{k.c.Addr},
 		Topic:    topic,
@@ -170,6 +162,26 @@ func (k *KafkaClient) Read() KafkaData {
 	return msg
 }
 
-func (k *KafkaClient) RPut(data KafkaData) {
+func (k *KafkaClient) Rput(data KafkaData) {
 	k.readChan <- data
+}
+
+func (k *KafkaClient) SendSync(data KafkaData) error {
+	w := &kafka.Writer{
+		Addr:     kafka.TCP(k.c.Addr),
+		Balancer: &kafka.LeastBytes{},
+	}
+	w.AllowAutoTopicCreation = true
+	messages := []kafka.Message{
+		{
+			Topic: data.Topic,
+			Key:   data.Key,
+			Value: data.Data,
+		},
+	}
+	var err error
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err = w.WriteMessages(ctx, messages...)
+	return err
 }

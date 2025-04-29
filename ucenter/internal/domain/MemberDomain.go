@@ -95,3 +95,12 @@ func (m *MemberDomain) FindByPhone(context context.Context, phone string) (*mode
 	return mem, nil
 
 }
+
+
+func (d *MemberDomain) FindMemberById(ctx context.Context, memberId int64) (*model.Member, error) {
+	id, err := d.MemberRepo.FindMemberById(ctx, memberId)
+	if err == nil && id == nil {
+		return nil, errors.New("用户不存在")
+	}
+	return id, err
+}

@@ -13,6 +13,7 @@ type ServiceContext struct {
 	UCRegisterRpc ucclient.Register
 	UCLoginRpc    ucclient.Login
 	UCAssetRpc    ucclient.Asset
+	UCMemberRpc   ucclient.Member
 	MarketRpc     mclient.Market
 }
 
@@ -22,6 +23,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UCRegisterRpc: ucclient.NewRegister(zrpc.MustNewClient(c.UcenterRpc)),
 		UCLoginRpc:    ucclient.NewLogin(zrpc.MustNewClient(c.UcenterRpc)),
 		UCAssetRpc:    ucclient.NewAsset(zrpc.MustNewClient(c.UcenterRpc)),
+		UCMemberRpc:   ucclient.NewMember(zrpc.MustNewClient(c.UcenterRpc)),
 		MarketRpc:     mclient.NewMarket(zrpc.MustNewClient(c.MarketRpc)),
 	}
 }

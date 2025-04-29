@@ -34,3 +34,11 @@ func (m *MemberWalletDao) Save(ctx context.Context, mw *model.MemberWallet) erro
 	session := m.conn.Session(ctx)
 	return session.Save(mw).Error
 }
+
+func (m *MemberWalletDao) UpdateFreeze(ctx context.Context, conn msdb.DbConn, memberId int64, symbol string, money float64) error {
+	con := conn.(*gorms.GormConn)
+	session := con.Tx(ctx)
+	sql := "update member_wallet set balance=balance-?, frozen_balance=frozen_balance+? where member_id=? and coin_name=?"
+	err := session.Model(&model.MemberWallet{}).Exec(sql, money, money, memberId,symbol).Error
+	return err
+}

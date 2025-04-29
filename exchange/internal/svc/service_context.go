@@ -17,7 +17,7 @@ type ServiceContext struct {
 	Cache       cache.Cache
 	Db          *msdb.MsDB
 	MongoClient *database.MongoClient
-	// MemberRpc   ucclient.Member
+	MemberRpc   ucclient.Member
 	MarketRpc   mclient.Market
 	AssetRpc    ucclient.Asset
 	KafkaClient *database.KafkaClient
@@ -45,7 +45,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Cache:       redisCache,
 		Db:          database.ConnMysql(c.Mysql),
 		MongoClient: database.ConnectMongo(c.Mongo),
-		// MemberRpc:   ucclient.NewMember(client),
+		MemberRpc:   ucclient.NewMember(client),
 		MarketRpc:   mclient.NewMarket(newClient),
 		AssetRpc:    ucclient.NewAsset(client),
 		KafkaClient: kafkaClient,

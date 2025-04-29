@@ -28,7 +28,8 @@ func NewAssetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AssetLogic 
 		Logger:             logx.WithContext(ctx),
 		CaptchaDomain:      domain.NewCaptchaDomain(),
 		MemberDomain:       domain.NewMemberDomain(svcCtx.Db),
-		memberWalletDomain: domain.NewMemberWalletDomain(svcCtx.Db),
+		memberWalletDomain:      domain.NewMemberWalletDomain(svcCtx.Db, svcCtx.MarketRpc, svcCtx.Cache),
+
 	}
 }
 

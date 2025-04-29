@@ -78,7 +78,7 @@ func (l *RegisterLogic) RegisterByPhone(in *register.RegReq) (*register.RegRes, 
 
 	// 获取原始 Redis 客户端
 
-	err := l.svcCtx.Redis.GetCtx(ctx, RegisterCacheKey+in.Phone, &redisCode)
+	err := l.svcCtx.Cache.GetCtx(ctx, RegisterCacheKey+in.Phone, &redisCode)
 	if err != nil {
 		logx.Errorf("获取验证码失败: %v", err)
 		return nil, errors.New("获取验证码失败")
@@ -127,7 +127,7 @@ func (l *RegisterLogic) SendCode(in *register.CodeReq) (*register.NoRes, error) 
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := l.svcCtx.Redis.SetWithExpireCtx(ctx, RegisterCacheKey+in.Phone, code, 15*time.Minute)
+	err := l.svcCtx.Cache.SetWithExpireCtx(ctx, RegisterCacheKey+in.Phone, code, 15*time.Minute)
 	if err != nil {
 		logx.Errorf("设置验证码缓存失败: %v", err)
 		return nil, errors.New("设置验证码缓存失败")

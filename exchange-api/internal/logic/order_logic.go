@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"exchange-api/internal/svc"
 	"exchange-api/internal/types"
 	"grpc-common/exchange/types/order"
@@ -49,7 +50,6 @@ func (l *OrderLogic) History(req *types.ExchangeReq) (*pages.PageResult, error) 
 
 }
 
-
 func (l *OrderLogic) Current(req *types.ExchangeReq) (*pages.PageResult, error) {
 	ctx, cancel := context.WithTimeout(l.ctx, 10*time.Second)
 	defer cancel()
@@ -72,3 +72,24 @@ func (l *OrderLogic) Current(req *types.ExchangeReq) (*pages.PageResult, error) 
 	return pages.New(b, req.PageNo, req.PageSize, orderRes.Total), nil
 }
 
+func (l *OrderLogic) AddOrder(req *types.ExchangeReq) (string, error) {
+
+	userId := l.ctx.Value("userId").(int64)
+	if !req.OrderValid() {
+		return "", errors.New("参数传递错误")
+	}
+	orderResp, err := l.svcCtx.OrderRpc.Add(l.ctx, &order.OrderReq{
+		Symbol:    req.Symbol,
+		UserId:    userId,
+		Direction: req.Direction,
+		Type:      req.Type,
+		Price:     req.Price,
+		Amount:    req.Amount,
+	})
+	if err != nil {
+		logx.Errorw("OrderRpc-AddOrder-ERROR", logx.Field("err", err))
+		return "", err
+	}
+	return orderResp.OrderId, nil
+
+}

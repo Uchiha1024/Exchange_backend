@@ -2,14 +2,16 @@ package svc
 
 import (
 	"exchange/internal/config"
-	// "exchange/internal/consumer"
+
+	"exchange/internal/consumer"
 	"exchange/internal/database"
-	// "exchange/internal/processor"
-	"github.com/zeromicro/go-zero/core/stores/cache"
-	"github.com/zeromicro/go-zero/zrpc"
+	"exchange/internal/processor"
 	"grpc-common/market/mclient"
 	"grpc-common/ucenter/ucclient"
 	"mscoin-common/msdb"
+
+	"github.com/zeromicro/go-zero/core/stores/cache"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type ServiceContext struct {
@@ -23,12 +25,12 @@ type ServiceContext struct {
 	KafkaClient *database.KafkaClient
 }
 
-// func (sc *ServiceContext) init() {
-// 	factory := processor.NewCoinTradeFactory()
-// 	factory.Init(sc.MarketRpc, sc.KafkaClient, sc.Db)
-// 	kafkaConsumer := consumer.NewKafkaConsumer(sc.KafkaClient, factory, sc.Db)
-// 	kafkaConsumer.Run()
-// }
+func (sc *ServiceContext) init() {
+	factory := processor.NewCoinTradeFactory()
+	factory.Init(sc.MarketRpc, sc.KafkaClient, sc.Db)
+	kafkaConsumer := consumer.NewKafkaConsumer(sc.KafkaClient, factory, sc.Db)
+	kafkaConsumer.Run()
+}
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	redisCache := cache.New(
@@ -50,6 +52,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		AssetRpc:    ucclient.NewAsset(client),
 		KafkaClient: kafkaClient,
 	}
-	// s.init()
+	s.init()
 	return s
 }

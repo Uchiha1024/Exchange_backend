@@ -10,30 +10,9 @@ import (
 	"market-api/internal/ws"
 )
 
-
-
-/* 
-WebsocketHandler 实现了 MarketHandler 接口的所有方法：
-HandleTrade
-HandleKLine
-HandleTradePlate
-这就是为什么它可以被传入 AddHandler 方法。
-在 Go 语言中，只要一个类型实现了某个接口的所有方法，它就自动实现了该接口，不需要显式声明。
-这是 Go 语言的接口实现机制的一个特点，称为隐式接口实现。
-这个设计的目的是：
-通过 WebSocket 向客户端实时推送市场数据
-处理不同类型的市场数据（K线、交易、盘口）
-将数据广播到不同的 WebSocket 主题
-这是一个典型的观察者模式实现，WebsocketHandler 作为一个观察者，监听和处理市场数据的变化，
-并通过 WebSocket 推送给客户端。 
-*/
-
-
-
 type WebsocketHandler struct {
 	wsServer *ws.WebsocketServer
 }
-
 
 func NewWebsocketHandler(wsServer *ws.WebsocketServer) *WebsocketHandler {
 	return &WebsocketHandler{
@@ -63,7 +42,6 @@ func (w *WebsocketHandler) HandleKLine(symbol string, kline *model.Kline, thumbM
 	result := &model.CoinThumb{}
 	copier.Copy(result, coinThumb)
 	marshal, _ := json.Marshal(result)
-	logx.Info("============coinThumbResult:", string(marshal))
 	w.wsServer.BroadcastToNamespace("/", "/topic/market/thumb", string(marshal))
 
 	bytes, _ := json.Marshal(kline)
@@ -71,5 +49,3 @@ func (w *WebsocketHandler) HandleKLine(symbol string, kline *model.Kline, thumbM
 
 	logx.Info("================WebsocketHandler End=======================")
 }
-
-

@@ -39,3 +39,9 @@ func (s *MarketServer) HistoryKline(ctx context.Context, in *market.MarketReq) (
 	logic := logic.NewMarketLogic(ctx, s.svcCtx)
 	return logic.HistoryKline(in)
 }
+
+
+func (e *MarketServer) FindExchangeCoinVisible(ctx context.Context, req *market.MarketReq) (*market.ExchangeCoinRes, error) {
+	l := logic.NewMarketLogic(ctx, e.svcCtx)
+	return l.FindExchangeCoinVisible(req)
+}

@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"exchange/internal/database"
 	"exchange/internal/model"
@@ -63,12 +64,12 @@ type OrderResult struct {
 func (k *KafkaDomain) WaitAddOrderResult() {
 	cli := k.cli.StartRead("exchange_order_init_complete_trading")
 	for {
-		kafkaData:= cli.Read()
+		kafkaData := cli.Read()
 		logx.Info("读取exchange_order_init_complete_trading 消息成功 orderId:" + string(kafkaData.Key))
 		var orderResult OrderResult
 		json.Unmarshal(kafkaData.Data, &orderResult)
 		// 先根据orderId查询订单
-		exchangeOrder,err   := k.orderDomain.FindByOrderId(context.Background(), orderResult.OrderId)
+		exchangeOrder, err := k.orderDomain.FindByOrderId(context.Background(), orderResult.OrderId)
 		if err != nil {
 			logx.Error(err)
 			// 更新订单状态，取消订单
@@ -79,20 +80,40 @@ func (k *KafkaDomain) WaitAddOrderResult() {
 				k.cli.RPut(kafkaData)
 				continue
 			}
-			if exchangeOrder == nil {
-				logx.Error("订单不存在，orderId=" + orderResult.OrderId)
-				continue
+		}
+
+		if exchangeOrder == nil {
+			logx.Error("订单不存在，orderId=" + orderResult.OrderId)
+			continue
+		}
+		if exchangeOrder.Status != model.Init {
+			logx.Error("订单已经被处理过")
+			continue
+		}
+		err = k.orderDomain.UpdateOrderStatusTrading(context.Background(), orderResult.OrderId)
+		if err != nil {
+			logx.Error(err)
+			k.cli.RPut(kafkaData)
+			continue
+		}
+		//需要发送消息到kafka 订单需要加入到撮合交易当中
+		//如果没有撮合交易成功 加入撮合交易的队列 继续等待完成撮合
+		exchangeOrder.Status = model.Trading
+		for {
+			logx.Info("============发送消息到exchange_order_trading============" + exchangeOrder.OrderId)
+			bytes, _ := json.Marshal(exchangeOrder)
+			orderData := database.KafkaData{
+				Topic: "exchange_order_trading",
+				Key:   []byte(exchangeOrder.OrderId),
+				Data:  bytes,
 			}
-			if exchangeOrder.Status != model.Init{
-				logx.Error("订单已经被处理过")
-				continue
-			}
-			err = k.orderDomain.UpdateOrderStatusTrading(context.Background(), orderResult.OrderId)
+			err := k.cli.SendSync(orderData)
 			if err != nil {
 				logx.Error(err)
-				k.cli.RPut(kafkaData)
+				time.Sleep(250 * time.Millisecond)
 				continue
 			}
+			break
 		}
 	}
 }

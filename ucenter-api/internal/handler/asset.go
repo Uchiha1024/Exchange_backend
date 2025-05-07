@@ -22,7 +22,7 @@ func NewAssetHandler(svcCtx *svc.ServiceContext) *AssetHandler {
 }
 
 func (h *AssetHandler) FindWalletBySymbol(w http.ResponseWriter, r *http.Request) {
-	var req *types.AssetReq
+	var req types.AssetReq
 	// 解析请求参数
 	if err := httpx.ParsePath(r, &req); err != nil {
 		httpx.ErrorCtx(r.Context(), w, err)
@@ -32,7 +32,19 @@ func (h *AssetHandler) FindWalletBySymbol(w http.ResponseWriter, r *http.Request
 	req.Ip = ip
 	// 调用服务层
 	logic := logic.NewAssetLogic(r.Context(), h.svcCtx)
-	resp, err := logic.FindWalletBySymbol(req)
+	resp, err := logic.FindWalletBySymbol(&req)
+	result := common.NewResult().Deal(resp, err)
+	httpx.OkJsonCtx(r.Context(), w, result)
+}
+
+func (h *AssetHandler) FindWallet(w http.ResponseWriter, r *http.Request) {
+	var req types.AssetReq
+
+	ip := tools.GetRemoteClientIp(r)
+	req.Ip = ip
+	// 调用服务层
+	logic := logic.NewAssetLogic(r.Context(), h.svcCtx)
+	resp, err := logic.FindWallet(&req)
 	result := common.NewResult().Deal(resp, err)
 	httpx.OkJsonCtx(r.Context(), w, result)
 }

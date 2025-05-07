@@ -30,7 +30,6 @@ func (l *AssetLogic) FindWalletBySymbol(req *types.AssetReq) (*types.MemberWalle
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	logx.Info("FindWalletBySymbol---req", req)
 	userId := l.ctx.Value("userId").(int64)
 	memberWallet, err := l.svcCtx.UCAssetRpc.FindWalletBySymbol(ctx, &asset.AssetReq{
 		CoinName: req.CoinName,
@@ -49,5 +48,22 @@ func (l *AssetLogic) FindWalletBySymbol(req *types.AssetReq) (*types.MemberWalle
 
 	return resp, nil
 
+}
 
+func (l *AssetLogic) FindWallet(req *types.AssetReq) ([]*types.MemberWallet, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	userId := l.ctx.Value("userId").(int64)
+	memberWallet, err := l.svcCtx.UCAssetRpc.FindWallet(ctx, &asset.AssetReq{
+		UserId: userId,
+	})
+	if err != nil {
+		logx.Errorf("RPC-FindWallet error: %v", err)
+		return nil, err
+	}
+	var resp []*types.MemberWallet
+	if err := copier.Copy(&resp, memberWallet.List); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

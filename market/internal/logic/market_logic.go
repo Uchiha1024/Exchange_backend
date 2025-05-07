@@ -118,3 +118,13 @@ func (l *MarketLogic) HistoryKline(req *market.MarketReq) (*market.HistoryRes, e
 	}, nil
 
 }
+
+
+func (l *MarketLogic) FindExchangeCoinVisible(req *market.MarketReq) (*market.ExchangeCoinRes, error) {
+	exchangeCoinRes := l.exchangeCoinDomain.FindVisible(l.ctx)
+	var list []*market.ExchangeCoin
+	copier.Copy(&list, exchangeCoinRes)
+	return &market.ExchangeCoinRes{
+		List: list,
+	}, nil
+}

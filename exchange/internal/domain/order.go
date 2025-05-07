@@ -20,6 +20,8 @@ type ExchangeOrderDomain struct {
 	orderRepo repo.ExchangeOrderRepo
 }
 
+
+
 func NewExchangeOrderDomain(db *msdb.MsDB) *ExchangeOrderDomain {
 	return &ExchangeOrderDomain{
 		orderRepo: dao.NewExchangeOrderDao(db),
@@ -45,7 +47,7 @@ func (d *ExchangeOrderDomain) FindOrderCurrent(ctx context.Context, symbol strin
 	if err != nil {
 		logx.Errorw("Domain-FindOrderCurrent", logx.Field("error", err))
 	}
-	voList := make([]*model.ExchangeOrderVo,len(list))
+	voList := make([]*model.ExchangeOrderVo, len(list))
 	for i, v := range list {
 		voList[i] = v.ToVo()
 
@@ -73,6 +75,16 @@ func (d *ExchangeOrderDomain) UpdateOrderStatusTrading(ctx context.Context, orde
 	return d.orderRepo.UpdateOrderStatusTrading(ctx, orderId)
 }
 
+
+func (d *ExchangeOrderDomain) FindOrderListBySymbol(ctx context.Context, symbol string, status int) ([]*model.ExchangeOrder, error) {
+	return d.orderRepo.FindOrderListBySymbol(ctx, symbol, status)
+}
+
+func (d *ExchangeOrderDomain) UpdateOrderComplete(context context.Context, orderInfo *model.ExchangeOrder) any {
+	return d.orderRepo.UpdateOrderComplete(context, orderInfo.OrderId, orderInfo.TradedAmount, orderInfo.Turnover, orderInfo.Status)
+}
+
+
 func (d *ExchangeOrderDomain) AddOrder(ctx context.Context, conn msdb.DbConn, order *model.ExchangeOrder, coin *mclient.ExchangeCoin,
 	baseWallet *ucclient.MemberWallet,
 	coinWallet *ucclient.MemberWallet) (float64, error) {
@@ -84,10 +96,10 @@ func (d *ExchangeOrderDomain) AddOrder(ctx context.Context, conn msdb.DbConn, or
 	//买 花USDT 市价 price 0 冻结的直接就是amount  卖 BTC
 	var money float64
 	if order.Direction == model.BUY {
-		if order.Type == model.MarketPrice{
+		if order.Type == model.MarketPrice {
 			money = order.Amount
 		} else {
-			money = op.MulFloor(order.Price , order.Amount , 8)
+			money = op.MulFloor(order.Price, order.Amount, 8)
 		}
 		if baseWallet.Balance < money {
 			return 0, errors.New("余额不足")

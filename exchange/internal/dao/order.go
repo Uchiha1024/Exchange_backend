@@ -102,3 +102,19 @@ func (e *ExchangeOrderDao) UpdateOrderStatusTrading(ctx context.Context, orderId
 	return err
 }
 
+
+func (e *ExchangeOrderDao) FindOrderListBySymbol(ctx context.Context, symbol string, status int) (list []*model.ExchangeOrder, err error) {
+	session := e.conn.Session(ctx)
+	err = session.Model(&model.ExchangeOrder{}).
+		Where("symbol=? and status=?", symbol, status).Find(&list).Error
+	return
+}
+
+
+func (e *ExchangeOrderDao) UpdateOrderComplete(ctx context.Context, orderId string, tradedAmount float64, turnover float64, status int) error {
+	session := e.conn.Session(ctx)
+	updateSql := "update exchange_order set traded_amount=?,turnover=?,status=? where order_id=? and status=?"
+	err := session.Model(&model.ExchangeOrder{}).Exec(updateSql, tradedAmount, turnover, status, orderId, model.Trading).Error
+	return err
+}
+

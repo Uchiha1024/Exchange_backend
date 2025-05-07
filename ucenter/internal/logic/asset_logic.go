@@ -28,8 +28,7 @@ func NewAssetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AssetLogic 
 		Logger:             logx.WithContext(ctx),
 		CaptchaDomain:      domain.NewCaptchaDomain(),
 		MemberDomain:       domain.NewMemberDomain(svcCtx.Db),
-		memberWalletDomain:      domain.NewMemberWalletDomain(svcCtx.Db, svcCtx.MarketRpc, svcCtx.Cache),
-
+		memberWalletDomain: domain.NewMemberWalletDomain(svcCtx.Db, svcCtx.MarketRpc, svcCtx.Cache),
 	}
 }
 
@@ -53,5 +52,19 @@ func (l *AssetLogic) FindWalletBySymbol(in *asset.AssetReq) (*asset.MemberWallet
 		return nil, err
 	}
 	return resp, nil
+
+}
+
+func (l *AssetLogic) FindWallet(in *asset.AssetReq) (*asset.MemberWalletList, error) {
+	//根据用户id查询用户的钱包 循环钱包信息 根据币种 查询币种详情
+	memberWallets, err := l.memberWalletDomain.FindWallet(l.ctx, in.UserId)
+	if err != nil {
+		return nil, err
+	}
+	var list []*asset.MemberWallet
+	err = copier.Copy(&list, memberWallets)
+	return &asset.MemberWalletList{
+		List: list,
+	}, err
 
 }

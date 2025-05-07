@@ -25,5 +25,6 @@ func RegisterHandlers(r *Routes, serverCtx *svc.ServiceContext) {
 	assetGroup.Use(midd.Auth(serverCtx.Config.JWT.AccessSecret))
 	asset := NewAssetHandler(serverCtx)
 	assetGroup.Post("/uc/asset/wallet/:coinName", asset.FindWalletBySymbol)
+	assetGroup.Post("/uc/asset/wallet", asset.FindWallet)
 
 }

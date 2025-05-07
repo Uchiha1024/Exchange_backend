@@ -27,3 +27,9 @@ func (s *AssetServer) FindWalletBySymbol(ctx context.Context, in *asset.AssetReq
 	l := logic.NewAssetLogic(ctx, s.svcCtx)
 	return l.FindWalletBySymbol(in)
 }
+
+
+func (s *AssetServer) FindWallet(ctx context.Context, in *asset.AssetReq) (*asset.MemberWalletList, error) {
+	l := logic.NewAssetLogic(ctx, s.svcCtx)
+	return l.FindWallet(in)
+}

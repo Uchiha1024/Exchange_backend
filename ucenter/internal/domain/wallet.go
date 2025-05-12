@@ -147,3 +147,16 @@ func (d *MemberWalletDomain) FindWallet(ctx context.Context, userId int64) (list
 	return list, nil
 
 }
+
+func (d *MemberWalletDomain) UpdateAddress(ctx context.Context, memberWallet *model.MemberWallet) error {
+	return d.memberWalletRepo.UpdateAddress(ctx, memberWallet)
+}
+
+func (d *MemberWalletDomain) GetAllAddress(ctx context.Context, coinName string) ([]string, error) {
+	return d.memberWalletRepo.FindAllAddress(ctx, coinName)
+}
+
+
+func (d *MemberWalletDomain) FindByAddress(ctx context.Context, address string) (*model.MemberWallet, error) {
+	return d.memberWalletRepo.FindByAddress(ctx, address)
+}

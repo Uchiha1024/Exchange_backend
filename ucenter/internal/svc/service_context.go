@@ -5,19 +5,21 @@ import (
 	"grpc-common/market/mclient"
 	"mscoin-common/msdb"
 	"ucenter/internal/config"
-	"ucenter/internal/database"
 	"ucenter/internal/consumer"
+	"ucenter/internal/database"
+
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type ServiceContext struct {
-	Config    config.Config
-	Cache     cache.Cache
-	Db        *msdb.MsDB
-	MarketRpc mclient.Market
-	KafkaCli  *database.KafkaClient
+	Config         config.Config
+	Cache          cache.Cache
+	Db             *msdb.MsDB
+	MarketRpc      mclient.Market
+	KafkaCli       *database.KafkaClient
+	BitcoinAddress string
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -36,6 +38,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	go consumer.ExchangeOrderAdd(newRedis, cli, order, mysql)
 	completeCli := cli.StartReadNew("exchange_order_complete_update_success")
 	go consumer.ExchangeOrderComplete(newRedis, completeCli, mysql)
+	btCli := cli.StartReadNew("BTC_TRANSACTION")
+	go consumer.BitCoinTransaction(newRedis, btCli, mysql)
 	return &ServiceContext{
 		Config:    c,
 		Cache:     redisCache,

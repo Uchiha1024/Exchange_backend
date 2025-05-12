@@ -48,3 +48,36 @@ func (h *AssetHandler) FindWallet(w http.ResponseWriter, r *http.Request) {
 	result := common.NewResult().Deal(resp, err)
 	httpx.OkJsonCtx(r.Context(), w, result)
 }
+
+func (h *AssetHandler) ResetAddress(w http.ResponseWriter, r *http.Request) {
+	var req types.AssetReq
+	// 解析请求参数
+	if err := httpx.ParseForm(r, &req); err != nil {
+		httpx.ErrorCtx(r.Context(), w, err)
+		return
+	}
+	ip := tools.GetRemoteClientIp(r)
+	req.Ip = ip
+	// 调用服务层
+	logic := logic.NewAssetLogic(r.Context(), h.svcCtx)
+	resp, err := logic.ResetAddress(&req)
+	result := common.NewResult().Deal(resp, err)
+	httpx.OkJsonCtx(r.Context(), w, result)
+
+}
+
+func (h *AssetHandler) FindTransaction(w http.ResponseWriter, r *http.Request) {
+	var req types.AssetReq
+		// 解析请求参数
+		if err := httpx.ParseForm(r, &req); err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
+		ip := tools.GetRemoteClientIp(r)
+		req.Ip = ip
+		// 调用服务层
+		logic := logic.NewAssetLogic(r.Context(), h.svcCtx)
+		resp, err := logic.FindTransaction(&req)
+		result := common.NewResult().Deal(resp, err)
+		httpx.OkJsonCtx(r.Context(), w, result)
+}

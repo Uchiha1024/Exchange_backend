@@ -68,3 +68,41 @@ func GetWithHeader(path string, m map[string]string, proxy string) ([]byte, erro
 	}
 	return rspBody, nil
 }
+
+
+
+func PostWithHeader(path string, params any, m map[string]string, proxy string) ([]byte, error) {
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancelFunc()
+	marshal, _ := json.Marshal(params)
+	s := string(marshal)
+	reqBody := strings.NewReader(s)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, path, reqBody)
+	if err != nil {
+		return nil, err
+	}
+	if m != nil {
+		for k, v := range m {
+			httpReq.Header.Set(k, v)
+		}
+	}
+	client := http.DefaultClient
+	if proxy != "" {
+		proxyAddress, _ := url.Parse(proxy)
+		client = &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(proxyAddress),
+			},
+		}
+	}
+	httpRsp, err := client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer httpRsp.Body.Close()
+	rspBody, err := io.ReadAll(httpRsp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return rspBody, nil
+}

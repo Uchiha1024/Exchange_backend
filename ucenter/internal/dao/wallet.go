@@ -69,3 +69,25 @@ func (m *MemberWalletDao) UpdateWallet(ctx context.Context, conn msdb.DbConn, id
 	err := tx.Model(&model.MemberWallet{}).Exec(updateSql, balance, frozenBalance, id).Error
 	return err
 }
+
+func (m *MemberWalletDao) UpdateAddress(ctx context.Context, wallet *model.MemberWallet) error {
+	session := m.conn.Session(ctx)
+	updateSql := "update member_wallet set address=?,address_private_key=? where id=?"
+	return session.Model(&model.MemberWallet{}).Exec(updateSql, wallet.Address, wallet.AddressPrivateKey, wallet.Id).Error
+}
+
+
+func (m *MemberWalletDao) FindByAddress(ctx context.Context, address string) (mw *model.MemberWallet, err error) {
+	session := m.conn.Session(ctx)
+	err = session.Model(&model.MemberWallet{}).Where("address=?", address).Take(&mw).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return
+}
+
+func (m *MemberWalletDao) FindAllAddress(ctx context.Context, coinName string) (list []string, err error) {
+	session := m.conn.Session(ctx)
+	err = session.Model(&model.MemberWallet{}).Where("coin_name=?", coinName).Select("address").Find(&list).Error
+	return
+}

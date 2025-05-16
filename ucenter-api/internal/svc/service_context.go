@@ -15,6 +15,7 @@ type ServiceContext struct {
 	UCAssetRpc    ucclient.Asset
 	UCMemberRpc   ucclient.Member
 	MarketRpc     mclient.Market
+	UCWithdrawRpc ucclient.Withdraw
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -25,5 +26,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UCAssetRpc:    ucclient.NewAsset(zrpc.MustNewClient(c.UcenterRpc)),
 		UCMemberRpc:   ucclient.NewMember(zrpc.MustNewClient(c.UcenterRpc)),
 		MarketRpc:     mclient.NewMarket(zrpc.MustNewClient(c.MarketRpc)),
+		UCWithdrawRpc: ucclient.NewWithdraw(zrpc.MustNewClient(c.UcenterRpc)),
 	}
 }

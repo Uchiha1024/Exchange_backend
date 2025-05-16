@@ -34,3 +34,8 @@ func (d *CoinDomain) FindByUnit(ctx context.Context, unit string) (*model.Coin, 
 	return coin, nil
 
 }
+
+
+func (d *CoinDomain) FindAll(ctx context.Context) ([]*model.Coin, error) {
+	return d.CoinRepo.FindAll(ctx)
+}

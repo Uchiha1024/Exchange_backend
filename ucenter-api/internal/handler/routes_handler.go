@@ -28,4 +28,17 @@ func RegisterHandlers(r *Routes, serverCtx *svc.ServiceContext) {
 	assetGroup.Post("/uc/asset/wallet", asset.FindWallet)
 	assetGroup.Post("/uc/asset/wallet/reset-address",asset.ResetAddress)
 	assetGroup.Post("/uc/asset/transaction/all",asset.FindTransaction)
+
+	// 提现部分 - 安全认证
+	approveGroup := r.Group()
+	approve := NewApproveHandler(serverCtx)
+	approveGroup.Use(midd.Auth(serverCtx.Config.JWT.AccessSecret))
+	approveGroup.Post("/uc/approve/security/setting", approve.SecuritySetting)
+
+	// 提现部分 - 提现
+	withdrawGroup := r.Group()
+	withdraw := NewWithdrawHandler(serverCtx)
+	withdrawGroup.Use(midd.Auth(serverCtx.Config.JWT.AccessSecret))
+	withdrawGroup.Post("/uc/withdraw/support/coin/info", withdraw.QueryWithdrawCoin)
+
 }

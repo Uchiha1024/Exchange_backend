@@ -36,3 +36,14 @@ func (d *CoinDao) FindByUnit(ctx context.Context, unit string) (*model.Coin, err
 	return coin, nil
 
 }
+
+
+func (d *CoinDao) FindAll(ctx context.Context) (list []*model.Coin, err error) {
+	session := d.conn.Session(ctx)
+	err = session.Model(&model.Coin{}).Find(&list).Error
+	if err != nil {
+		logx.Errorf("query findAllCoin error: %v", err)
+		return nil, err
+	}
+	return 
+}

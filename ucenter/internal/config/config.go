@@ -16,6 +16,7 @@ type Config struct {
 	MarketRpc   zrpc.RpcClientConf
 	ExchangeRpc zrpc.RpcClientConf
 	Kafka       database.KafkaConfig
+	Bitcoin     BitCoinConfig
 }
 
 type AuthConfig struct {
@@ -30,4 +31,7 @@ type CaptchaConfig struct {
 
 type MysqlConfig struct {
 	DataSource string
+}
+type BitCoinConfig struct {
+	Address string
 }

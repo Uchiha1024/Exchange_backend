@@ -5,6 +5,7 @@ import (
 	"grpc-common/market/types/market"
 	"market/internal/domain"
 	"market/internal/svc"
+	"time"
 
 	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -71,8 +72,6 @@ func (l *MarketLogic) SymbolInfo(in *market.MarketReq) (*market.ExchangeCoin, er
 
 }
 
-
-
 func (l *MarketLogic) CoinInfo(in *market.MarketReq) (*market.Coin, error) {
 	coin, err := l.coinDomain.FindByUnit(l.ctx, in.Unit)
 	if err != nil {
@@ -86,7 +85,6 @@ func (l *MarketLogic) CoinInfo(in *market.MarketReq) (*market.Coin, error) {
 	return coinInfo, nil
 
 }
-
 
 func (l *MarketLogic) HistoryKline(req *market.MarketReq) (*market.HistoryRes, error) {
 	period := "1H"
@@ -108,9 +106,9 @@ func (l *MarketLogic) HistoryKline(req *market.MarketReq) (*market.HistoryRes, e
 		period = "1M"
 	}
 
-	histories,err := l.marketDomain.HistoryKline(l.ctx,req.Symbol,period,req.From,req.To)
+	histories, err := l.marketDomain.HistoryKline(l.ctx, req.Symbol, period, req.From, req.To)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	return &market.HistoryRes{
@@ -118,7 +116,6 @@ func (l *MarketLogic) HistoryKline(req *market.MarketReq) (*market.HistoryRes, e
 	}, nil
 
 }
-
 
 func (l *MarketLogic) FindExchangeCoinVisible(req *market.MarketReq) (*market.ExchangeCoinRes, error) {
 	exchangeCoinRes := l.exchangeCoinDomain.FindVisible(l.ctx)
@@ -128,7 +125,6 @@ func (l *MarketLogic) FindExchangeCoinVisible(req *market.MarketReq) (*market.Ex
 		List: list,
 	}, nil
 }
-
 
 func (l *MarketLogic) FindAllCoin(req *market.MarketReq) (*market.CoinList, error) {
 	coinList, err := l.coinDomain.FindAll(l.ctx)
@@ -140,4 +136,18 @@ func (l *MarketLogic) FindAllCoin(req *market.MarketReq) (*market.CoinList, erro
 	return &market.CoinList{
 		List: list,
 	}, nil
+}
+
+func (l *MarketLogic) FindById(req *market.MarketReq) (*market.Coin, error) {
+	ctx, cancel := context.WithTimeout(l.ctx, 5*time.Second)
+	defer cancel()
+	coin, err := l.coinDomain.FindCoinId(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	mc := &market.Coin{}
+	if err := copier.Copy(mc, coin); err != nil {
+		return nil, err
+	}
+	return mc, nil
 }

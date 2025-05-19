@@ -7,6 +7,7 @@ import (
 	"grpc-common/ucenter/types/login"
 	"grpc-common/ucenter/types/member"
 	"grpc-common/ucenter/types/register"
+	"grpc-common/ucenter/types/withdraw"
 	"ucenter/internal/config"
 	"ucenter/internal/server"
 	"ucenter/internal/svc"
@@ -34,6 +35,7 @@ func main() {
 		login.RegisterLoginServer(grpcServer, server.NewLoginServer(ctx))
 		asset.RegisterAssetServer(grpcServer, server.NewAssetServer(ctx))
 		member.RegisterMemberServer(grpcServer, server.NewMemberServer(ctx))
+		withdraw.RegisterWithdrawServer(grpcServer, server.NewWithdrawServer(ctx))
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
 		}

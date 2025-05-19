@@ -50,3 +50,8 @@ func (e *MarketServer) FindAllCoin(ctx context.Context, req *market.MarketReq) (
 	l := logic.NewMarketLogic(ctx, e.svcCtx)
 	return l.FindAllCoin(req)
 }
+
+func (e *MarketServer) FindCoinById(ctx context.Context, req *market.MarketReq) (*market.Coin, error) {
+	l := logic.NewMarketLogic(ctx, e.svcCtx)
+	return l.FindById(req)
+}

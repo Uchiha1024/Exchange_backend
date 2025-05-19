@@ -37,7 +37,6 @@ func (d *CoinDao) FindByUnit(ctx context.Context, unit string) (*model.Coin, err
 
 }
 
-
 func (d *CoinDao) FindAll(ctx context.Context) (list []*model.Coin, err error) {
 	session := d.conn.Session(ctx)
 	err = session.Model(&model.Coin{}).Find(&list).Error
@@ -45,5 +44,15 @@ func (d *CoinDao) FindAll(ctx context.Context) (list []*model.Coin, err error) {
 		logx.Errorf("query findAllCoin error: %v", err)
 		return nil, err
 	}
-	return 
+	return
+}
+
+func (d *CoinDao) FindById(ctx context.Context, id int64) (*model.Coin, error) {
+	session := d.conn.Session(ctx)
+	coin := &model.Coin{}
+	err := session.Model(&model.Coin{}).Where("id=?", id).Take(coin).Error
+	if err != nil && err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return coin, err
 }

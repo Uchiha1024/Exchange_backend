@@ -40,5 +40,8 @@ func RegisterHandlers(r *Routes, serverCtx *svc.ServiceContext) {
 	withdraw := NewWithdrawHandler(serverCtx)
 	withdrawGroup.Use(midd.Auth(serverCtx.Config.JWT.AccessSecret))
 	withdrawGroup.Post("/uc/withdraw/support/coin/info", withdraw.QueryWithdrawCoin)
+	withdrawGroup.Post("/uc/mobile/withdraw/code",withdraw.SendCode)
+	withdrawGroup.Post("/uc/withdraw/apply/code",withdraw.WithdrawCode)
+	withdrawGroup.Post("/uc/withdraw/record", withdraw.Record)
 
 }

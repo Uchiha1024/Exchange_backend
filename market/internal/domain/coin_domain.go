@@ -35,7 +35,17 @@ func (d *CoinDomain) FindByUnit(ctx context.Context, unit string) (*model.Coin, 
 
 }
 
-
 func (d *CoinDomain) FindAll(ctx context.Context) ([]*model.Coin, error) {
 	return d.CoinRepo.FindAll(ctx)
+}
+
+func (d *CoinDomain) FindCoinId(ctx context.Context, id int64) (*model.Coin, error) {
+	coin, err := d.CoinRepo.FindById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if coin == nil {
+		return nil, errors.New("not support this coin")
+	}
+	return coin, nil
 }
